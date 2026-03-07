@@ -238,7 +238,7 @@ function scheduleRevolutionCheckTransition(gameId) {
     currentGame.revolutionTimer = null;
     if (currentGame.status !== 'revolution-check') return;
 
-    currentGame.startTaxPhase();
+    currentGame.finalizeRevolutionCheck(true);
     emitGameStateAndHands(currentGame);
   }, 30000);
 }
@@ -273,7 +273,9 @@ class DalmutiGame {
     this.turnTimer = null;
     this.turnEndsAt = null;
     this.skipTaxThisRound = false;
-    this.revolutionSkippedPlayerIds = [];
+    this.revolutionConfirmedPlayerIds = [];
+    this.revolutionDeclaredBy = null;
+    this.revolutionDeclaredType = null;
     this.lastRoundScores = [];
     this.lastGameScoreRanking = [];
     this.restartRequested = false;
@@ -751,7 +753,9 @@ class DalmutiGame {
     this.revolutionInfo = null;
     this.revolutionCheckEndsAt = Date.now() + 30000;
     this.skipTaxThisRound = false;
-    this.revolutionSkippedPlayerIds = [];
+    this.revolutionConfirmedPlayerIds = [];
+    this.revolutionDeclaredBy = null;
+    this.revolutionDeclaredType = null;
 
     this.discardPile = [];
     this.lastPlayerId = null;
@@ -771,25 +775,93 @@ class DalmutiGame {
     this.revolutionEligiblePlayerId = eligiblePlayer ? eligiblePlayer.id : null;
   }
 
+  buildRevolutionInfo(initiator, isGreatRevolution) {
+    return {
+      happened: true,
+      initiatorId: initiator.id,
+      initiatorName: initiator.name,
+      type: isGreatRevolution ? 'great-reverse' : 'tax-free',
+      message: isGreatRevolution
+        ? `${initiator.name}님이 조커 2장을 공개해 대혁명을 선언했습니다! 계급이 역전되며 이번 라운드는 세금이 없습니다.`
+        : `${initiator.name}님이 조커 2장을 공개해 혁명을 선언했습니다! 계급은 유지되며 이번 라운드는 세금이 없습니다.`
+    };
+  }
+
+  finalizeRevolutionCheck(force = false) {
+    if (this.status !== 'revolution-check') {
+      return { completed: false };
+    }
+
+    const confirmedSet = new Set(this.revolutionConfirmedPlayerIds);
+    const everyoneConfirmed = this.players.every(player => {
+      if (this.revolutionDeclaredBy && player.id === this.revolutionDeclaredBy) {
+        return true;
+      }
+
+      return confirmedSet.has(player.id);
+    });
+
+    if (!force && !everyoneConfirmed) {
+      return { completed: false };
+    }
+
+    if (this.revolutionDeclaredBy) {
+      const initiator = this.players.find(player => player.id === this.revolutionDeclaredBy);
+      const isGreatRevolution = this.revolutionDeclaredType === 'great';
+
+      if (initiator) {
+        if (isGreatRevolution) {
+          this.players.reverse();
+        }
+
+        this.dalmutiId = this.players[0]?.id || null;
+        this.peonId = this.players[this.players.length - 1]?.id || null;
+
+        this.skipTaxThisRound = true;
+        this.status = 'playing';
+        this.currentPlayerIndex = 0;
+        this.discardPile = [];
+        this.tableState = { value: null, count: 0 };
+        this.lastPlayerId = null;
+        this.passCount = 0;
+        this.revolutionInfo = this.buildRevolutionInfo(initiator, isGreatRevolution);
+      } else {
+        this.startTaxPhase();
+      }
+    } else {
+      this.startTaxPhase();
+    }
+
+    this.revolutionCheckEndsAt = null;
+    this.revolutionEligiblePlayerId = null;
+    this.revolutionConfirmedPlayerIds = [];
+    this.revolutionDeclaredBy = null;
+    this.revolutionDeclaredType = null;
+
+    return { completed: true, nextStatus: this.status, revolutionInfo: this.revolutionInfo };
+  }
+
   skipRevolution(playerId) {
     if (this.status !== 'revolution-check') {
       return { success: false, message: '넘기기를 진행할 수 없는 시점입니다' };
     }
 
-    if (!this.revolutionEligiblePlayerId) {
-      return { success: false, message: '혁명 선택 가능한 플레이어가 없습니다' };
+    const player = this.players.find(currentPlayer => currentPlayer.id === playerId);
+    if (!player) {
+      return { success: false, message: '플레이어를 찾을 수 없습니다' };
     }
 
-    if (this.revolutionEligiblePlayerId !== playerId) {
-      return { success: false, message: '혁명 선택 가능한 플레이어만 확인완료를 할 수 있습니다' };
+    if (this.revolutionDeclaredBy && this.revolutionDeclaredBy === playerId) {
+      return { success: false, message: '혁명 선언 플레이어는 확인완료 대상이 아닙니다' };
     }
 
-    this.revolutionSkippedPlayerIds = [playerId];
-    this.revolutionCheckEndsAt = null;
-    this.revolutionEligiblePlayerId = null;
-    this.startTaxPhase();
+    if (!this.revolutionConfirmedPlayerIds.includes(playerId)) {
+      this.revolutionConfirmedPlayerIds.push(playerId);
+    }
 
-    return { success: true };
+    const finalizeResult = this.finalizeRevolutionCheck(false);
+
+    return { success: true, completed: finalizeResult.completed };
   }
 
   triggerRevolution(playerId, revolutionType = 'normal') {
@@ -799,6 +871,10 @@ class DalmutiGame {
 
     if (!this.revolutionEligiblePlayerId || this.revolutionEligiblePlayerId !== playerId) {
       return { success: false, message: '혁명을 일으킬 조건이 아닙니다' };
+    }
+
+    if (this.revolutionConfirmedPlayerIds.includes(playerId)) {
+      return { success: false, message: '이미 확인완료를 선택했습니다' };
     }
 
     const initiator = this.players.find(player => player.id === playerId);
@@ -813,37 +889,17 @@ class DalmutiGame {
       return { success: false, message: '대혁명은 꼴등 플레이어만 선택할 수 있습니다' };
     }
 
-    // 대혁명 시 계급 역전
-    if (isGreatRevolution) {
-      this.players.reverse();
+    if (this.revolutionDeclaredBy) {
+      return { success: false, message: '이미 혁명이 선언되었습니다' };
     }
 
-    this.dalmutiId = this.players[0]?.id || null;
-    this.peonId = this.players[this.players.length - 1]?.id || null;
+    this.revolutionDeclaredBy = playerId;
+    this.revolutionDeclaredType = isGreatRevolution ? 'great' : 'normal';
 
-    this.skipTaxThisRound = true;
-    this.revolutionCheckEndsAt = null;
-    this.revolutionEligiblePlayerId = null;
-    this.revolutionSkippedPlayerIds = [];
+    const revolutionInfo = this.buildRevolutionInfo(initiator, isGreatRevolution);
+    const finalizeResult = this.finalizeRevolutionCheck(false);
 
-    this.status = 'playing';
-    this.currentPlayerIndex = 0;
-    this.discardPile = [];
-    this.tableState = { value: null, count: 0 };
-    this.lastPlayerId = null;
-    this.passCount = 0;
-
-    this.revolutionInfo = {
-      happened: true,
-      initiatorId: initiator.id,
-      initiatorName: initiator.name,
-      type: isGreatRevolution ? 'great-reverse' : 'tax-free',
-      message: isGreatRevolution
-        ? `${initiator.name}님이 조커 2장을 공개해 대혁명을 선언했습니다! 계급이 역전되며 이번 라운드는 세금이 없습니다.`
-        : `${initiator.name}님이 조커 2장을 공개해 혁명을 선언했습니다! 계급은 유지되며 이번 라운드는 세금이 없습니다.`
-    };
-
-    return { success: true, revolutionInfo: this.revolutionInfo };
+    return { success: true, revolutionInfo, completed: finalizeResult.completed };
   }
 
   startTaxPhase() {
@@ -851,7 +907,9 @@ class DalmutiGame {
     this.status = 'tax-phase';
     this.revolutionCheckEndsAt = null;
     this.revolutionEligiblePlayerId = null;
-    this.revolutionSkippedPlayerIds = [];
+    this.revolutionConfirmedPlayerIds = [];
+    this.revolutionDeclaredBy = null;
+    this.revolutionDeclaredType = null;
     this.dalmutiReceivedTaxCards = [];
     this.taxCardsFromPeon = [];
 
@@ -1013,7 +1071,9 @@ class DalmutiGame {
     this.revolutionEligiblePlayerId = null;
     this.revolutionCheckEndsAt = null;
     this.revolutionInfo = null;
-    this.revolutionSkippedPlayerIds = [];
+    this.revolutionConfirmedPlayerIds = [];
+    this.revolutionDeclaredBy = null;
+    this.revolutionDeclaredType = null;
     this.skipTaxThisRound = false;
 
     this.restartRequested = true;
@@ -1090,6 +1150,9 @@ class DalmutiGame {
       dalmutiId: this.dalmutiId,
       peonId: this.peonId,
       revolutionCheckEndsAt: this.revolutionCheckEndsAt,
+      revolutionDeclaredBy: this.revolutionDeclaredBy,
+      revolutionDeclaredType: this.revolutionDeclaredType,
+      revolutionConfirmedPlayerIds: this.revolutionConfirmedPlayerIds,
       revolutionInfo: this.revolutionInfo,
       turnEndsAt: this.turnEndsAt,
       taxCardsFromPeon: this.taxCardsFromPeon,
@@ -1283,7 +1346,10 @@ io.on('connection', (socket) => {
 
     const result = game.triggerRevolution(socket.id, 'normal');
     if (result.success) {
-      clearRevolutionTimer(game);
+      if (game.status !== 'revolution-check') {
+        clearRevolutionTimer(game);
+      }
+
       emitGameStateAndHands(game);
       io.to(gameId).emit('revolutionAnnounced', result.revolutionInfo);
       emitPublicGamesList();
@@ -1298,7 +1364,10 @@ io.on('connection', (socket) => {
 
     const result = game.triggerRevolution(socket.id, 'great');
     if (result.success) {
-      clearRevolutionTimer(game);
+      if (game.status !== 'revolution-check') {
+        clearRevolutionTimer(game);
+      }
+
       emitGameStateAndHands(game);
       io.to(gameId).emit('revolutionAnnounced', result.revolutionInfo);
       emitPublicGamesList();
@@ -1317,7 +1386,10 @@ io.on('connection', (socket) => {
       return;
     }
 
-    clearRevolutionTimer(game);
+    if (game.status !== 'revolution-check') {
+      clearRevolutionTimer(game);
+    }
+
     emitGameStateAndHands(game);
     emitPublicGamesList();
   });

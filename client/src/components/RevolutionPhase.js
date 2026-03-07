@@ -4,7 +4,6 @@ import { getCardImageSrc, getCardLabel } from '../utils/cardImage';
 
 function RevolutionPhase({ gameState, playerInfo, playerHand, socket, gameId, onLeaveGame }) {
   const [secondsLeft, setSecondsLeft] = useState(30);
-  const [submittedAction, setSubmittedAction] = useState('');
 
   const myName = useMemo(() => {
     const me = gameState.players.find(player => player.id === playerInfo.id);
@@ -14,9 +13,35 @@ function RevolutionPhase({ gameState, playerInfo, playerHand, socket, gameId, on
   const isPeon = playerInfo.id === gameState.peonId;
   const jokerCount = playerHand.filter(card => card.value === 'JOKER').length;
   const canChooseRevolution = jokerCount === 2;
+  const confirmedPlayerIds = gameState.revolutionConfirmedPlayerIds || [];
+  const revolutionDeclaredBy = gameState.revolutionDeclaredBy || null;
+  const isRevolutionDeclared = Boolean(revolutionDeclaredBy);
+  const isRevolutionDeclarer = revolutionDeclaredBy === playerInfo.id;
+  const hasConfirmed = confirmedPlayerIds.includes(playerInfo.id);
+  const revolutionDeclarerName = gameState.players.find(player => player.id === revolutionDeclaredBy)?.name || '플레이어';
+
+  const requiredConfirmCount = gameState.players.length - (isRevolutionDeclared ? 1 : 0);
+  const confirmedCount = gameState.players.reduce((count, player) => {
+    if (isRevolutionDeclared && player.id === revolutionDeclaredBy) {
+      return count;
+    }
+
+    return count + (confirmedPlayerIds.includes(player.id) ? 1 : 0);
+  }, 0);
+  const remainingCount = Math.max(0, requiredConfirmCount - confirmedCount);
+
+  const canSubmitRevolution = canChooseRevolution
+    && !isRevolutionDeclared
+    && !hasConfirmed
+    && secondsLeft > 0;
+  const canSubmitGreatRevolution = canSubmitRevolution && isPeon;
+  const canConfirmPass = !hasConfirmed
+    && !isRevolutionDeclarer
+    && secondsLeft > 0
+    && gameState.status === 'revolution-check';
 
   useEffect(() => {
-    setSubmittedAction('');
+    setSecondsLeft(30);
   }, [gameState.round, gameState.status]);
 
   useEffect(() => {
@@ -47,28 +72,25 @@ function RevolutionPhase({ gameState, playerInfo, playerHand, socket, gameId, on
   };
 
   const handleStartRevolution = () => {
-    if (!canChooseRevolution || submittedAction || secondsLeft === 0) return;
+    if (!canSubmitRevolution) return;
     socket.emit('startRevolution', gameId);
-    setSubmittedAction('revolution');
   };
 
   const handleStartGreatRevolution = () => {
-    if (!canChooseRevolution || !isPeon || submittedAction || secondsLeft === 0) return;
+    if (!canSubmitGreatRevolution) return;
     socket.emit('startGreatRevolution', gameId);
-    setSubmittedAction('great-revolution');
   };
 
   const handleConfirmDone = () => {
-    if (!canChooseRevolution || submittedAction || secondsLeft === 0) return;
+    if (!canConfirmPass) return;
     socket.emit('skipRevolution', gameId);
-    setSubmittedAction('confirmed');
   };
 
   return (
     <div className="revolution-phase-container">
       <div className="revolution-header">
         <h1>🃏 혁명 확인 페이즈</h1>
-        <p>{myName}님의 손패를 확인하세요. 최대 30초 후 다음 단계로 이동합니다.</p>
+        <p>{myName}님의 손패를 확인하세요. 최대 30초 후 자동으로 다음 단계로 이동합니다.</p>
       </div>
 
       <div className="countdown-box">
@@ -87,9 +109,23 @@ function RevolutionPhase({ gameState, playerInfo, playerHand, socket, gameId, on
         </div>
       </div>
 
+      <div className="revolution-wait-box">
+        {isRevolutionDeclared ? (
+          <>
+            <p>🔥 {revolutionDeclarerName}님이 혁명을 선언했습니다.</p>
+            <p>확인 완료: {confirmedCount}/{requiredConfirmCount} (남은 인원: {remainingCount}명)</p>
+          </>
+        ) : (
+          <>
+            <p>아직 혁명 선언이 없습니다.</p>
+            <p>모든 플레이어가 확인 완료 넘기기를 누르면 세금 징수 페이즈로 이동합니다.</p>
+          </>
+        )}
+      </div>
+
       {canChooseRevolution ? (
         <div className="revolution-action-box">
-          <h3>🔥 선택 가능: 혁명 / 확인완료</h3>
+          <h3>🔥 선택 가능: 혁명 / 확인 완료 넘기기</h3>
           <p>조커 2장을 확인했습니다. 원하는 행동을 선택하세요.</p>
           <p className="rule-hint">
             {isPeon
@@ -100,35 +136,40 @@ function RevolutionPhase({ gameState, playerInfo, playerHand, socket, gameId, on
             <button
               className="revolution-btn"
               onClick={handleStartRevolution}
-              disabled={Boolean(submittedAction) || secondsLeft === 0}
+              disabled={!canSubmitRevolution}
             >
-              {submittedAction === 'revolution' ? '혁명 요청 전송됨' : '혁명'}
+              {isRevolutionDeclarer ? '혁명 선언 완료' : '혁명'}
             </button>
 
             {isPeon && (
               <button
                 className="great-revolution-btn"
                 onClick={handleStartGreatRevolution}
-                disabled={Boolean(submittedAction) || secondsLeft === 0}
+                disabled={!canSubmitGreatRevolution}
               >
-                {submittedAction === 'great-revolution' ? '대혁명 요청 전송됨' : '대혁명'}
+                {isRevolutionDeclarer ? '대혁명 선언 완료' : '대혁명'}
               </button>
             )}
-
-            <button
-              className="confirm-btn"
-              onClick={handleConfirmDone}
-              disabled={Boolean(submittedAction) || secondsLeft === 0}
-            >
-              {submittedAction === 'confirmed' ? '확인완료 전송됨' : '확인완료'}
-            </button>
           </div>
         </div>
       ) : (
-        <div className="revolution-wait-box">
-          <p>손패 확인 중입니다. 시간이 끝나면 다음 단계로 이동합니다.</p>
+        <div className="revolution-action-box">
+          <h3>혁명 선언 조건 없음</h3>
+          <p>확인 완료 넘기기를 눌러 다음 단계로 진행하세요.</p>
         </div>
       )}
+
+      <button
+        className="confirm-btn"
+        onClick={handleConfirmDone}
+        disabled={!canConfirmPass}
+      >
+        {isRevolutionDeclarer
+          ? '혁명 선언 완료'
+          : hasConfirmed
+            ? '확인 완료됨'
+            : '확인 완료 넘기기'}
+      </button>
 
       <button className="leave-button" onClick={onLeaveGame}>
         게임 나가기
