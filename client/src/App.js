@@ -17,7 +17,10 @@ function App() {
   const [publicGames, setPublicGames] = useState([]);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5000');
+    const socketUrl = (process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000').trim();
+    const newSocket = io(socketUrl, {
+      transports: ['websocket', 'polling']
+    });
 
     newSocket.on('connect', () => {
       newSocket.emit('requestPublicGames');

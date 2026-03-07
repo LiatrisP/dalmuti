@@ -1,0 +1,9 @@
+node_modules/
+npm-debug.log
+.DS_Store
+.vscode
+build/
+dist/
+.env
+.env.*
+!.env.example

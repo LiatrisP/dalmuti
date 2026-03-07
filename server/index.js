@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -5,15 +7,48 @@ const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
-});
+const configuredClientOrigins = (process.env.CLIENT_URLS || 'http://localhost:3000')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+const allowVercelPreviewOrigins = process.env.ALLOW_VERCEL_PREVIEW !== 'false';
 
-app.use(cors());
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+
+  if (configuredClientOrigins.includes(origin)) {
+    return true;
+  }
+
+  // Support Vercel preview deploy URLs unless explicitly disabled.
+  if (allowVercelPreviewOrigins && /^https:\/\/.*\.vercel\.app$/i.test(origin)) {
+    return true;
+  }
+
+  return false;
+}
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  methods: ['GET', 'POST'],
+  credentials: true
+};
+
+const io = socketIo(server, { cors: corsOptions });
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
+app.get('/health', (_req, res) => {
+  res.status(200).json({ ok: true });
+});
 
 const games = {};
 const players = {};

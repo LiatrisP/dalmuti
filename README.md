@@ -29,6 +29,26 @@ dalmuti/
 - Node.js 14+ 
 - npm 또는 yarn
 
+### 환경변수 설정
+
+`client/.env.example`, `server/.env.example`를 참고해서 실제 `.env` 파일을 만들어 주세요.
+
+- `client/.env`
+```env
+REACT_APP_SOCKET_URL=http://localhost:5000
+```
+
+- `server/.env`
+```env
+PORT=5000
+CLIENT_URLS=http://localhost:3000
+ALLOW_VERCEL_PREVIEW=true
+```
+
+배포 시에는 아래 값을 실제 도메인으로 변경해야 합니다.
+- `REACT_APP_SOCKET_URL`: 배포된 Socket 서버 주소
+- `CLIENT_URLS`: 프론트 주소들(쉼표 구분)
+
 ### 서버 설치 및 실행
 
 1. 서버 폴더로 이동
@@ -106,6 +126,49 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## ☁️ 무료 배포 (Vercel + Render/Railway)
+
+이 프로젝트는 Socket.IO 실시간 연결이 필요하므로 `프론트(Vercel)` + `백엔드(Render/Railway)` 분리 배포를 권장합니다.
+
+### 1) Socket 서버 배포 (Render 또는 Railway)
+
+1. GitHub 저장소 연결
+2. 서버 루트 디렉토리를 `server`로 지정
+3. Build Command: `npm install`
+4. Start Command: `npm start`
+5. 환경변수 설정
+
+```env
+PORT=5000
+CLIENT_URLS=https://<vercel-프로젝트>.vercel.app
+ALLOW_VERCEL_PREVIEW=true
+```
+
+여러 도메인을 허용하려면 `CLIENT_URLS`를 쉼표로 구분합니다.
+
+```env
+CLIENT_URLS=https://<vercel-프로젝트>.vercel.app,https://<커스텀도메인>
+```
+
+### 2) 프론트 배포 (Vercel)
+
+1. Vercel에서 GitHub 저장소 Import
+2. Root Directory를 `client`로 지정
+3. 환경변수 설정
+
+```env
+REACT_APP_SOCKET_URL=https://<배포된-백엔드-도메인>
+```
+
+4. Deploy 실행
+
+### 3) 배포 후 체크리스트
+
+1. 프론트 접속 후 방 생성 가능
+2. 다른 브라우저/기기에서 코드로 참여 가능
+3. 공개방 목록이 실시간으로 갱신됨
+4. 브라우저 콘솔에 CORS/WebSocket 에러가 없음
 
 ## 🤝 기여
 
