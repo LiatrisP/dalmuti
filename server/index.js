@@ -885,6 +885,10 @@ class DalmutiGame {
     const isPeon = playerId === this.peonId;
     const isGreatRevolution = revolutionType === 'great';
 
+    if (isPeon && !isGreatRevolution) {
+      return { success: false, message: '대혁명이 가능한 상태에서는 대혁명만 선택할 수 있습니다' };
+    }
+
     if (isGreatRevolution && !isPeon) {
       return { success: false, message: '대혁명은 꼴등 플레이어만 선택할 수 있습니다' };
     }

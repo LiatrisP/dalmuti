@@ -35,6 +35,8 @@ function RevolutionPhase({ gameState, playerInfo, playerHand, socket, gameId, on
     && !hasConfirmed
     && secondsLeft > 0;
   const canSubmitGreatRevolution = canSubmitRevolution && isPeon;
+  const showGreatRevolutionOnly = canChooseRevolution && isPeon;
+  const showNormalRevolutionOnly = canChooseRevolution && !isPeon;
   const canConfirmPass = !hasConfirmed
     && !isRevolutionDeclarer
     && secondsLeft > 0
@@ -125,23 +127,29 @@ function RevolutionPhase({ gameState, playerInfo, playerHand, socket, gameId, on
 
       {canChooseRevolution ? (
         <div className="revolution-action-box">
-          <h3>🔥 선택 가능: 혁명 / 확인 완료 넘기기</h3>
+          <h3>
+            {showGreatRevolutionOnly
+              ? '🔥 선택 가능: 대혁명 / 확인 완료 넘기기'
+              : '🔥 선택 가능: 혁명 / 확인 완료 넘기기'}
+          </h3>
           <p>조커 2장을 확인했습니다. 원하는 행동을 선택하세요.</p>
           <p className="rule-hint">
             {isPeon
-              ? '혁명: 계급 유지 + 세금 없음 / 대혁명: 계급 역전 + 세금 없음'
+              ? '대혁명: 계급 역전 + 세금 없음'
               : '혁명: 계급 유지 + 세금 없음'}
           </p>
           <div className="revolution-action-buttons">
-            <button
-              className="revolution-btn"
-              onClick={handleStartRevolution}
-              disabled={!canSubmitRevolution}
-            >
-              {isRevolutionDeclarer ? '혁명 선언 완료' : '혁명'}
-            </button>
+            {showNormalRevolutionOnly && (
+              <button
+                className="revolution-btn"
+                onClick={handleStartRevolution}
+                disabled={!canSubmitRevolution}
+              >
+                {isRevolutionDeclarer ? '혁명 선언 완료' : '혁명'}
+              </button>
+            )}
 
-            {isPeon && (
+            {showGreatRevolutionOnly && (
               <button
                 className="great-revolution-btn"
                 onClick={handleStartGreatRevolution}
