@@ -1,0 +1,44 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-start: #021214;
+  --bg-end: #092124;
+  --surface-1: rgba(6, 26, 29, 0.85);
+  --surface-2: rgba(9, 33, 36, 0.72);
+  --surface-3: rgba(9, 33, 36, 0.55);
+  --surface-card: rgba(255, 255, 255, 0.06);
+  --text-main: #e5f4ee;
+  --text-muted: #9eb8b0;
+  --accent: #0d9472;
+  --accent-strong: #0b7b5f;
+  --accent-soft: rgba(13, 148, 114, 0.24);
+  --danger: #c75353;
+  --warning: #d38e2f;
+  --gold: #d9be74;
+  --border-soft: rgba(152, 199, 184, 0.28);
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}

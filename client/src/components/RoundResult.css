@@ -1,0 +1,232 @@
+.round-result-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  padding: 20px;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.round-result-container h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.result-ranking {
+  background: var(--surface-1);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid var(--border-soft);
+}
+
+.result-ranking h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+}
+
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ranking-item {
+  background: var(--surface-3);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 4px solid var(--accent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.ranking-item:hover {
+  background: rgba(9, 33, 36, 0.82);
+  transform: translateX(5px);
+}
+
+.ranking-item.rank-1 {
+  background: linear-gradient(135deg, rgba(217, 190, 116, 0.24) 0%, rgba(9, 33, 36, 0.9) 100%);
+  border-left: 4px solid var(--gold);
+  box-shadow: 0 0 15px rgba(217, 190, 116, 0.35);
+}
+
+.ranking-item.rank-2 {
+  background: linear-gradient(135deg, rgba(13, 148, 114, 0.2) 0%, rgba(9, 33, 36, 0.88) 100%);
+  border-left: 4px solid rgba(111, 210, 183, 0.7);
+}
+
+.ranking-item.current-player {
+  background: rgba(13, 148, 114, 0.24);
+  border-left: 4px solid var(--accent);
+}
+
+.ranking-position {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  min-width: 60px;
+}
+
+.player-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+}
+
+.player-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.you-badge {
+  background: rgba(13, 148, 114, 0.45);
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+.role-title {
+  text-align: right;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.score-badge {
+  min-width: 140px;
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #9fe5d0;
+}
+
+.next-round-info {
+  background: var(--surface-2);
+  backdrop-filter: blur(10px);
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  border: 2px solid rgba(13, 148, 114, 0.55);
+  min-width: 300px;
+}
+
+.next-round-info h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.next-round-info p {
+  margin: 8px 0;
+  font-size: 1rem;
+}
+
+.countdown {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--accent);
+  margin-top: 15px;
+  animation: pulse 1s infinite;
+}
+
+.game-over {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--gold);
+  margin-top: 15px;
+  animation: celebrate 1s infinite;
+}
+
+.result-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.restart-btn,
+.leave-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+}
+
+.restart-btn {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+}
+
+.restart-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.leave-btn {
+  background: linear-gradient(135deg, #b94d4d 0%, #8a3434 100%);
+}
+
+.action-hint {
+  margin-top: 10px;
+  color: #a7d9cb;
+  font-size: 0.9rem;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes celebrate {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .round-result-container h2 {
+    font-size: 1.8rem;
+  }
+
+  .result-ranking {
+    padding: 20px;
+  }
+
+  .ranking-item {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .role-title {
+    width: 100%;
+    text-align: left;
+    margin-top: 5px;
+  }
+
+  .score-badge {
+    width: 100%;
+    text-align: left;
+  }
+}

@@ -1,0 +1,159 @@
+.app {
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px;
+  color: var(--text-main);
+}
+
+.error-message {
+  background: rgba(199, 83, 83, 0.88);
+  border: 2px solid var(--danger);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.waiting-room {
+  background: var(--surface-1);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 40px;
+  text-align: center;
+}
+
+.waiting-room h1 {
+  margin-bottom: 30px;
+  font-size: 2.5em;
+}
+
+.game-code-display {
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.game-code-display label {
+  display: block;
+  font-size: 0.9em;
+  opacity: 0.8;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.code-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.code-text {
+  font-size: 1.8em;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 3px;
+  color: var(--gold);
+}
+
+.copy-btn {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.copy-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(13, 148, 114, 0.35);
+}
+
+.copy-btn:active {
+  transform: scale(0.98);
+}
+
+.player-list {
+  background: var(--surface-3);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.player-list h2 {
+  margin-bottom: 15px;
+}
+
+.player-list ul {
+  list-style: none;
+  text-align: left;
+}
+
+.player-list li {
+  padding: 10px;
+  background: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.owner-badge {
+  background: linear-gradient(135deg, #d9be74 0%, #b8994f 100%);
+  color: #102018;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+.waiting-room button {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1.1em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  margin: 0 10px;
+}
+
+.waiting-room button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.waiting-room button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.waiting-room .leave-btn {
+  background: linear-gradient(135deg, var(--danger) 0%, #9f3b3b 100%);
+}

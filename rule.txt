@@ -1,0 +1,212 @@
+0. 전제 (웹게임 구현 기준)
+
+턴제 카드 게임
+
+라운드 단위 진행
+
+한 판(게임)은 여러 라운드로 구성
+
+라운드 종료 시 계급(rank) 갱신
+
+다음 라운드에 계급에 따른 카드 교환
+
+1. 카드 구성 (고정)
+1.1 카드 덱
+
+Dalmuti 표준 덱 (인원 수와 무관)
+
+카드	장수
+1	1
+2	2
+3	3
+…	…
+12	12
+Joker	2
+
+총 카드 수: 1+2+…+12 + 2 = 80장
+
+숫자 작을수록 강함
+
+Joker는 와일드 카드
+
+type Card = {
+  value: number | "JOKER"; // 1~12 or JOKER
+}
+
+2. 인원 수별 기본 세팅 (4~8인)
+인원	사용 덱	카드 분배
+4	80장	20장씩
+5	80장	16장씩
+6	80장	13장씩 + 2장 버림
+7	80장	11장씩 + 3장 버림
+8	80장	10장씩
+
+👉 버림 처리
+
+남는 카드는 라운드 시작 전 무작위 폐기
+
+공개 안 함
+
+const handSize = Math.floor(80 / playerCount);
+
+3. 계급 시스템 (가장 중요)
+3.1 계급 목록 (인원 수에 따라 결정)
+4인
+
+Great Dalmuti
+
+Lesser Dalmuti
+
+Lesser Peon
+
+Great Peon
+
+5인
+
+Great Dalmuti
+
+Lesser Dalmuti
+
+Merchant
+
+Lesser Peon
+
+Great Peon
+
+6인
+
+Great Dalmuti
+
+Lesser Dalmuti
+
+Greater Merchant
+
+Lesser Merchant
+
+Lesser Peon
+
+Great Peon
+
+7인
+
+Merchant 3명
+
+8인
+
+Merchant 4명
+
+👉 규칙
+
+라운드 종료 순서 == 다음 라운드 계급
+
+먼저 끝낼수록 높은 계급
+
+player.rank = finishOrderIndex;
+
+4. 라운드 시작 로직
+4.1 카드 셔플 & 분배
+
+덱 생성
+
+셔플
+
+인원 수에 맞게 분배
+
+나머지는 폐기
+
+5. 카드 교환 (계급 핵심 규칙)
+5.1 교환 매핑
+계급	행동
+Great Dalmuti	카드 2장 받음
+Lesser Dalmuti	카드 1장 받음
+Merchant	교환 없음
+Lesser Peon	카드 1장 줌
+Great Peon	카드 2장 줌
+5.2 교환 규칙
+
+Peon → Dalmuti
+
+Peon은 자신이 가진 가장 강한 카드를 줘야 함
+
+Dalmuti는 아무 카드나 반환 가능
+
+// Peon이 주는 카드
+function getStrongestCards(hand, count) {
+  // value 낮을수록 강함
+}
+
+
+⚠️ Joker도 강한 카드로 취급됨
+
+6. 라운드 진행 (턴 로직)
+6.1 시작 플레이어
+
+Great Dalmuti가 선
+
+첫 라운드는 랜덤
+
+7. 턴 플레이 규칙
+7.1 플레이 가능한 행동
+
+패스
+
+카드 제출
+
+7.2 제출 규칙
+
+같은 숫자 n장
+
+현재 테이블보다:
+
+더 강한 숫자
+
+같은 장수
+
+type TableState = {
+  value: number | null;
+  count: number;
+}
+
+7.3 Joker 처리
+
+Joker는 부족한 장수 보완
+
+단독으로도 제출 가능
+
+Joker만 낼 경우 → value 지정 필요
+
+8. 트릭 종료 조건
+
+모든 플레이어가 연속으로 패스
+
+마지막으로 카드 낸 플레이어가 새 트릭 시작
+
+if (passCount === activePlayers - 1) {
+  resetTable();
+}
+
+9. 플레이어 탈락 처리
+
+패가 0장 되면 라운드 종료 순위 기록
+
+이후 턴 스킵
+
+마지막 1명 자동 최하위
+
+10. 라운드 종료
+
+모든 플레이어 순위 확정
+
+계급 재배정
+
+다음 라운드 시작
+
+11. 게임 종료 조건 (선택)
+
+n 라운드 고정
+
+특정 점수 도달
+
+Great Dalmuti 연속 유지 횟수
+
+if (round >= MAX_ROUND) endGame();

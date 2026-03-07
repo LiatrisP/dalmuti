@@ -1,0 +1,263 @@
+.card-draw-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  padding: 20px;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card-draw-container h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.draw-info {
+  background: var(--surface-3);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  text-align: center;
+  border: 1px solid var(--border-soft);
+}
+
+.draw-info p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+.draw-status {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.draw-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.draw-button {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  border: none;
+  color: white;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(13, 148, 114, 0.35);
+  font-weight: bold;
+}
+
+.draw-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(13, 148, 114, 0.45);
+}
+
+.draw-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #37524f 0%, #2a3f3d 100%);
+}
+
+.drawn-card-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.drawn-card-display p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.turn-order-text {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #6fd2b7;
+  text-shadow: 0 0 8px rgba(13, 148, 114, 0.4);
+}
+
+.card-big {
+  width: 108px;
+  aspect-ratio: 167 / 334;
+  background: linear-gradient(135deg, #0d2d37 0%, #0a2025 100%);
+  color: var(--accent);
+  border: 3px solid var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card-big-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 5px;
+}
+
+.draw-results {
+  margin-top: 40px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.draw-results h3 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.draw-order-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.draw-entry {
+  background: var(--surface-3);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.draw-entry:hover {
+  transform: translateY(-5px);
+  background: rgba(9, 33, 36, 0.8);
+  border-color: var(--accent);
+}
+
+.draw-entry.dalmuti {
+  background: linear-gradient(135deg, rgba(13, 148, 114, 0.4) 0%, rgba(9, 33, 36, 0.9) 100%);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(13, 148, 114, 0.35);
+}
+
+.draw-entry.peon {
+  background: linear-gradient(135deg, rgba(12, 86, 71, 0.6) 0%, rgba(7, 31, 34, 0.95) 100%);
+  border-color: rgba(111, 210, 183, 0.4);
+}
+
+.draw-entry.merchant {
+  background: linear-gradient(135deg, rgba(8, 43, 48, 0.82) 0%, rgba(4, 20, 24, 0.95) 100%);
+  border-color: rgba(130, 174, 162, 0.35);
+}
+
+.draw-rank {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 5px;
+}
+
+.player-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.drawn-card {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawn-card-image {
+  width: 42px;
+  aspect-ratio: 167 / 334;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.role {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 8px;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.game-starting {
+  margin-top: 40px;
+  background: rgba(13, 148, 114, 0.24);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  animation: pulse 1s infinite;
+}
+
+.game-starting p {
+  margin: 5px 0;
+  font-size: 1.1rem;
+}
+
+.draw-actions {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.draw-actions .leave-btn {
+  background: linear-gradient(135deg, var(--danger) 0%, #9f3b3b 100%);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.draw-actions .leave-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(199, 83, 83, 0.35);
+}
+
+/* 결과 표시 상태일 때 강조 */
+.card-draw-container h2 {
+  transition: all 0.3s ease;
+}
+
+.card-draw-container:has(.game-starting) h2 {
+  color: #6fd2b7;
+  text-shadow: 0 0 10px rgba(13, 148, 114, 0.5);
+}
+
+@media (max-width: 768px) {
+  .card-draw-container h2 {
+    font-size: 1.8rem;
+  }
+
+  .draw-order-list {
+    grid-template-columns: 1fr;
+  }
+
+  .card-big {
+    width: 90px;
+    font-size: 2.5rem;
+  }
+}

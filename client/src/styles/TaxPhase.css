@@ -1,0 +1,335 @@
+.tax-phase-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  color: white;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.tax-phase-header {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: slideDown 0.5s ease;
+}
+
+.tax-phase-header h1 {
+  font-size: 2.5em;
+  margin: 0 0 10px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tax-phase-header p {
+  font-size: 1.1em;
+  margin: 10px 0 0 0;
+  opacity: 0.95;
+}
+
+/* Peon 뷰 */
+.peon-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface-1);
+  border-radius: 20px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--border-soft);
+  max-width: 600px;
+  width: 100%;
+}
+
+.tax-cards-display {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.instruction {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #6fd2b7;
+}
+
+.cards-container {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 820px;
+  margin: 0 auto 20px;
+}
+
+.card {
+  width: 60px;
+  aspect-ratio: 167 / 334;
+  background: linear-gradient(135deg, #0d2d37 0%, #0a2025 100%);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-soft);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  cursor: default;
+  animation: slideUp 0.6s ease;
+  overflow: hidden;
+}
+
+.tax-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 5px;
+}
+
+.tax-card {
+  background: linear-gradient(135deg, rgba(13, 148, 114, 0.4) 0%, rgba(9, 33, 36, 0.95) 100%);
+  font-weight: bold;
+}
+
+.card-value {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: white;
+  line-height: 1;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  padding: 0 6px;
+}
+
+.card-suit {
+  font-size: 1.4em;
+  margin-top: 5px;
+}
+
+.pass-button {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
+}
+
+.pass-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(13, 148, 114, 0.35);
+}
+
+.pass-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.forced-text {
+  font-size: 0.95em;
+  font-style: italic;
+  color: #8dd8c3;
+  margin: 0;
+}
+
+.leave-button {
+  margin-top: 14px;
+  background: var(--surface-3);
+  color: white;
+  border: 1px solid var(--border-soft);
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.leave-button:hover {
+  background: rgba(9, 33, 36, 0.88);
+}
+
+/* Dalmuti 뷰 */
+.dalmuti-view {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  background: var(--surface-1);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--border-soft);
+  max-width: 900px;
+  width: 100%;
+}
+
+.received-cards-section,
+.hand-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #8dd8c3;
+  text-align: center;
+}
+
+.hand-cards {
+  gap: 10px;
+}
+
+.hand-card {
+  background: linear-gradient(135deg, #0e2f3a 0%, #0a2025 100%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hand-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+.hand-card.selected {
+  background: linear-gradient(135deg, rgba(13, 148, 114, 0.35) 0%, rgba(9, 33, 36, 0.94) 100%);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(13, 148, 114, 0.6);
+  transform: scale(1.1);
+}
+
+.selection-info {
+  text-align: center;
+  font-size: 1.1em;
+  color: #8dd8c3;
+  font-weight: bold;
+}
+
+.submit-button {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.submit-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(13, 148, 114, 0.35);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spectator 뷰 */
+.spectator-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  background: var(--surface-1);
+  border-radius: 20px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--border-soft);
+  max-width: 600px;
+  width: 100%;
+}
+
+.waiting-message {
+  text-align: center;
+}
+
+.waiting-message p {
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+
+.sub-text {
+  font-size: 0.95em;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.players-info {
+  background: var(--surface-3);
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+  text-align: left;
+}
+
+.players-info p {
+  margin: 8px 0;
+  font-size: 1em;
+}
+
+/* 애니메이션 */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .tax-phase-header h1 {
+    font-size: 2em;
+  }
+
+  .cards-container {
+    gap: 10px;
+    max-width: 100%;
+  }
+
+  .card {
+    width: 54px;
+    border-radius: 7px;
+  }
+
+  .tax-card-image {
+    border-radius: 4px;
+  }
+
+  .card-value {
+    font-size: 1.5em;
+  }
+
+  .pass-button,
+  .submit-button {
+    padding: 12px 30px;
+    font-size: 1em;
+  }
+}
