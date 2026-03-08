@@ -162,6 +162,22 @@ function GameBoard({ gameState, playerInfo, playerHand, onPlayCards, onLeaveGame
       return;
     }
 
+    // 새 트릭 시작 시에는 같은 숫자 카드를 가능한 만큼 한 번에 선택한다.
+    if (
+      selectedCards.length === 0 &&
+      gameState.tableState.value === null &&
+      card.value !== 'JOKER'
+    ) {
+      const sameValueCards = playerHand
+        .map((handCard, idx) => ({ ...handCard, _index: idx }))
+        .filter(handCard => handCard.value === card.value);
+
+      if (sameValueCards.length > 0 && canPlayCardsLocally(toCardPayload(sameValueCards))) {
+        setSelectedCards(sameValueCards);
+        return;
+      }
+    }
+
     // 이어치기 시작 시, 같은 숫자 + 조커를 자동으로 채워 필요한 장수를 한 번에 선택
     if (
       selectedCards.length === 0 &&
