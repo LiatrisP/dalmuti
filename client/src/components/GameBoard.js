@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './GameBoard.css';
 import { getCardImageSrc, getCardLabel } from '../utils/cardImage';
 
 const TURN_LIMIT_SECONDS = 30;
+const REVOLUTION_INDICATOR_DURATION_MS = 10000;
 
 function GameBoard({ gameState, playerInfo, playerHand, onPlayCards, onLeaveGame }) {
   const [selectedCards, setSelectedCards] = useState([]);
   const [turnJustStarted, setTurnJustStarted] = useState(false);
   const [turnTimeLeft, setTurnTimeLeft] = useState(TURN_LIMIT_SECONDS);
   const [turnTimeProgress, setTurnTimeProgress] = useState(1);
+  const [isRevolutionIndicatorVisible, setIsRevolutionIndicatorVisible] = useState(false);
+  const lastRevolutionIndicatorKeyRef = useRef('');
   const gameStatus = gameState?.status;
   const turnEndsAt = gameState?.turnEndsAt;
+  const revolutionInitiatorId = gameState?.revolutionInfo?.initiatorId;
+  const revolutionType = gameState?.revolutionInfo?.type;
+  const revolutionMessage = gameState?.revolutionInfo?.message;
 
   const isCurrentPlayer = gameState && gameState.currentPlayerId === playerInfo.id;
 
@@ -48,6 +54,32 @@ function GameBoard({ gameState, playerInfo, playerHand, onPlayCards, onLeaveGame
     const timer = setInterval(tick, 120);
     return () => clearInterval(timer);
   }, [gameStatus, turnEndsAt]);
+
+  useEffect(() => {
+    if (!revolutionInitiatorId || !revolutionType || gameState?.status !== 'playing') {
+      setIsRevolutionIndicatorVisible(false);
+
+      if (gameState?.status !== 'playing') {
+        lastRevolutionIndicatorKeyRef.current = '';
+      }
+
+      return;
+    }
+
+    const revolutionKey = `${gameState.round}-${revolutionInitiatorId}-${revolutionType}`;
+    if (lastRevolutionIndicatorKeyRef.current === revolutionKey) {
+      return;
+    }
+
+    lastRevolutionIndicatorKeyRef.current = revolutionKey;
+    setIsRevolutionIndicatorVisible(true);
+
+    const timer = setTimeout(() => {
+      setIsRevolutionIndicatorVisible(false);
+    }, REVOLUTION_INDICATOR_DURATION_MS);
+
+    return () => clearTimeout(timer);
+  }, [gameState?.round, gameState?.status, revolutionInitiatorId, revolutionType]);
 
   if (!gameState) {
     return <div className="game-board">게임 로딩 중...</div>;
@@ -262,8 +294,7 @@ function GameBoard({ gameState, playerInfo, playerHand, onPlayCards, onLeaveGame
   const isRoundWinner = roundWinnerId === playerInfo.id;
   const isSpectating = myHandSize === 0;
   const activePlayersLeft = gameState.players.filter(player => player.isActive).length;
-  const revolutionMessage = gameState.revolutionInfo?.message;
-  const showRevolutionIndicator = Boolean(revolutionMessage) && gameState.status === 'playing';
+  const showRevolutionIndicator = isRevolutionIndicatorVisible && Boolean(revolutionMessage);
 
   return (
     <div className="game-board">
